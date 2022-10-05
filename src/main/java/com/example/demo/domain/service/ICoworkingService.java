@@ -1,6 +1,7 @@
 package com.example.demo.domain.service;
 
 import com.example.demo.domain.entity.Coworking;
+import com.example.demo.domain.entity.Reserva;
 
 public interface ICoworkingService {
 
@@ -11,5 +12,11 @@ public interface ICoworkingService {
     public Coworking saveCoworking(Coworking coworking);
     public void deleteCoworkingById(Long id);
     public Coworking updateCoworking(Coworking coworking);
+
+    public Iterable<Reserva>getAllReservas();
+    public Reserva getByIdReserva(Long id);
+    public Reserva saveReserva(Reserva reserva);
+    public void deleteReservaById(Long id);
+    public Reserva updateReserva(Reserva coworking);
     
 }

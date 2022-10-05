@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import com.example.demo.domain.entity.Coworking;
+import com.example.demo.domain.entity.Reserva;
 import com.example.demo.domain.entity.Usuario;
 import com.example.demo.domain.service.ICoworkingService;
 import com.example.demo.domain.service.IUsuarioService;
@@ -19,6 +20,8 @@ public class UsuarioController {
     private IUsuarioService usuarioService;
     @Autowired
     private ICoworkingService coworkingService;
+    @Autowired
+    private ICoworkingService reservaService;
 
     Long idLogueado;
 
@@ -34,12 +37,6 @@ public class UsuarioController {
     public String espaciosCoworking(Model model) {
         model.addAttribute("AllCoworking", coworkingService.getAllCoworking());
         return "espaciosCoworking"; //va hacia el template
-    }
-    //reserva
-    @GetMapping({ "/reserva" })
-    public String Reserva(Model model) {
-        model.addAttribute("AllCoworking", coworkingService.getAllCoworking());
-        return "reserva"; //va hacia el template
     }
 
     // Front Inicio de Sesion
@@ -63,7 +60,7 @@ public class UsuarioController {
                 pg = "redirect:/espaciosCoworking";      
             }
             else {
-                pg = "redirect:/reserva";
+                pg = "redirect:/gestionReservas";
             }   
         }
         else{
@@ -144,6 +141,80 @@ public class UsuarioController {
         coworkingService.deleteCoworkingById(id);
 
         return "redirect:/espaciosCoworking";
+    }
+/////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //gestionReservas
+    @GetMapping({ "/gestionReservas" })
+    public String gestionReservas(Model model) {
+        model.addAttribute("AllReservas", reservaService.getAllReservas());
+        return "gestionReservas"; //va hacia el template
+    }
+    //reserva con id
+    @GetMapping("/reserva/{id}")
+    public String reserva(@PathVariable Long id, Model model) {
+        Reserva reserva = reservaService.getByIdReserva(id);
+        if (reserva.getId() != 0) {
+            model.addAttribute("reserva", reserva);
+            return "reserva";
+        } else {
+            return "reserva";
+        }
+    }
+
+    // crear espacio de coworking
+    @GetMapping("/crearReserva")
+    public String crearReserva(Model model) {
+        Reserva coworking = new Reserva();
+        model.addAttribute("reserva", coworking);
+        return "crearReserva";
+    }
+
+    @PostMapping("/guardarReserva")
+    public String saveReserva(@ModelAttribute("reserva") Reserva reserva) {
+        reservaService.saveReserva(reserva);
+
+        return "redirect:/gestionReservas";
+    }
+    // editar reserva
+    @GetMapping("/editarReserva/{id}")
+    public String editarReserva(@PathVariable Long id, Model model) {
+        Reserva reserva = reservaService.getByIdReserva(id);
+        if (reserva.getId() != 0) {
+            model.addAttribute("reserva", reserva);
+            return "editarReserva";
+        } else {
+            return "editarReserva";
+        }
+    }
+
+    @PostMapping("/editarReserva/{id}")
+    public String updateReserva(@PathVariable Long id,
+            @ModelAttribute("reserva") Reserva reserva,
+            Model model) {
+
+        Reserva reservaExistente = reservaService.getByIdReserva(id);
+
+        reservaExistente.setId(reserva.getId());
+        reservaExistente.setNombres(reserva.getNombres());
+        reservaExistente.setCorreo(reserva.getCorreo());
+        reservaExistente.setTelefono(reserva.getTelefono());
+        reservaExistente.setEspacio(reserva.getEspacio());
+        reservaExistente.setCantidad(reserva.getCantidad());
+        reservaExistente.setHora_inicial(reserva.getHora_inicial());
+        reservaExistente.setHora_final(reserva.getHora_final());
+        reservaExistente.setFecha(reserva.getFecha());
+
+        reservaService.saveReserva(reserva);
+        return "redirect:/gestionReservas";
+    }
+    //eliminar espacio de coworking
+    @PostMapping("eliminarReserva/{id}")
+    public String deleteReserva(@PathVariable Long id, Model model) {
+        reservaService.deleteReservaById(id);
+
+        return "redirect:/gestionReservas";
     }
 
 }
